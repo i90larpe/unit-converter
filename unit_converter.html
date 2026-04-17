@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<title>Unit Converter</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', Arial, sans-serif; background: #f0f0f0; min-height: 100vh; }
+
+  .tabs { display: flex; flex-wrap: wrap; gap: 4px; padding: 10px 10px 0; background: #e0e0e0; overflow-x: auto; }
+  .tab-btn { padding: 10px 16px; border: none; border-radius: 10px 10px 0 0; cursor: pointer;
+    font-size: 14px; font-weight: 600; color: #555; background: #d0d0d0; transition: all 0.2s; white-space: nowrap; }
+  .tab-btn.active { color: #fff; transform: translateY(-2px); }
+
+  .tab-content { display: none; padding: 24px 16px; margin: 0 10px 10px; border-radius: 0 0 12px 12px; min-height: 280px; }
+  .tab-content.active { display: block; }
+
+  .title { font-size: 22px; font-weight: bold; text-align: center; margin-bottom: 20px; }
+  .row { display: flex; gap: 10px; align-items: center; margin-bottom: 12px; flex-wrap: wrap; }
+  .row label { font-size: 14px; font-weight: 600; min-width: 90px; text-align: right; }
+  .row select, .row input { font-size: 16px; padding: 8px 12px; border: 1px solid #ccc; border-radius: 8px; flex: 1; min-width: 120px; }
+  .row select { background: #fff; }
+
+  .convert-btn { display: block; margin: 18px auto; padding: 12px 36px; border: none; border-radius: 10px;
+    font-size: 16px; font-weight: bold; color: #fff; cursor: pointer; transition: opacity 0.2s; }
+  .convert-btn:hover { opacity: 0.85; }
+
+  .result { text-align: center; font-size: 20px; font-weight: bold; margin-top: 16px; min-height: 28px; }
+  .rate-info { text-align: center; font-size: 12px; color: #888; margin-top: 6px; min-height: 18px; }
+
+  /* Tab colors */
+  .tab-btn[data-tab="temperature"].active, .convert-btn.temperature { background: #FF6B6B; }
+  .tab-content.temperature { background: #FFF0F0; } .result.temperature { color: #FF6B6B; }
+
+  .tab-btn[data-tab="length"].active, .convert-btn.length { background: #4ECDC4; }
+  .tab-content.length { background: #F0FFFE; } .result.length { color: #4ECDC4; }
+
+  .tab-btn[data-tab="weight"].active, .convert-btn.weight { background: #FFB347; }
+  .tab-content.weight { background: #FFF8F0; } .result.weight { color: #FFB347; }
+
+  .tab-btn[data-tab="volume"].active, .convert-btn.volume { background: #77DD77; }
+  .tab-content.volume { background: #F0FFF0; } .result.volume { color: #77DD77; }
+
+  .tab-btn[data-tab="currency"].active, .convert-btn.currency { background: #A78BFA; }
+  .tab-content.currency { background: #F5F0FF; } .result.currency { color: #A78BFA; }
+
+  .tab-btn[data-tab="pricevol"].active, .convert-btn.pricevol { background: #E07B53; }
+  .tab-content.pricevol { background: #FFF5F0; } .result.pricevol { color: #E07B53; }
+</style>
+</head>
+<body>
+
+<div class="tabs">
+  <button class="tab-btn active" data-tab="temperature">🔄 Temperature</button>
+  <button class="tab-btn" data-tab="length">🔄 Length</button>
+  <button class="tab-btn" data-tab="weight">🔄 Weight</button>
+  <button class="tab-btn" data-tab="volume">🔄 Volume</button>
+  <button class="tab-btn" data-tab="currency">💱 Currency</button>
+  <button class="tab-btn" data-tab="pricevol">⛽ Price/Volume</button>
+</div>
+
+<!-- Temperature -->
+<div class="tab-content temperature active" id="temperature">
+  <div class="title" style="color:#FF6B6B">🔄 Temperature Converter</div>
+  <div class="row"><label>From:</label><select id="temp-from"><option>Celsius</option><option>Fahrenheit</option><option>Kelvin</option></select></div>
+  <div class="row"><label>To:</label><select id="temp-to"><option>Fahrenheit</option><option>Celsius</option><option>Kelvin</option></select></div>
+  <div class="row"><label>Value:</label><input type="number" id="temp-val" inputmode="decimal" placeholder="Enter value"></div>
+  <button class="convert-btn temperature" onclick="convertUnit('temperature')">Convert</button>
+  <div class="result temperature" id="temp-result"></div>
+</div>
+
+<!-- Length -->
+<div class="tab-content length" id="length">
+  <div class="title" style="color:#4ECDC4">🔄 Length Converter</div>
+  <div class="row"><label>From:</label><select id="length-from"><option>Meters</option><option>Yards</option></select></div>
+  <div class="row"><label>To:</label><select id="length-to"><option>Yards</option><option>Meters</option></select></div>
+  <div class="row"><label>Value:</label><input type="number" id="length-val" inputmode="decimal" placeholder="Enter value"></div>
+  <button class="convert-btn length" onclick="convertUnit('length')">Convert</button>
+  <div class="result length" id="length-result"></div>
+</div>
+
+<!-- Weight -->
+<div class="tab-content weight" id="weight">
+  <div class="title" style="color:#FFB347">🔄 Weight Converter</div>
+  <div class="row"><label>From:</label><select id="weight-from"><option>Kilograms</option><option>Pounds</option></select></div>
+  <div class="row"><label>To:</label><select id="weight-to"><option>Pounds</option><option>Kilograms</option></select></div>
+  <div class="row"><label>Value:</label><input type="number" id="weight-val" inputmode="decimal" placeholder="Enter value"></div>
+  <button class="convert-btn weight" onclick="convertUnit('weight')">Convert</button>
+  <div class="result weight" id="weight-result"></div>
+</div>
+
+<!-- Volume -->
+<div class="tab-content volume" id="volume">
+  <div class="title" style="color:#77DD77">🔄 Volume Converter</div>
+  <div class="row"><label>From:</label><select id="volume-from"><option>Liters</option><option>Gallons</option></select></div>
+  <div class="row"><label>To:</label><select id="volume-to"><option>Gallons</option><option>Liters</option></select></div>
+  <div class="row"><label>Value:</label><input type="number" id="volume-val" inputmode="decimal" placeholder="Enter value"></div>
+  <button class="convert-btn volume" onclick="convertUnit('volume')">Convert</button>
+  <div class="result volume" id="volume-result"></div>
+</div>
+
+<!-- Currency -->
+<div class="tab-content currency" id="currency">
+  <div class="title" style="color:#A78BFA">💱 Currency Converter</div>
+  <div class="row"><label>From:</label><select id="cur-from"><option>SEK</option><option>EUR</option><option>USD</option><option>GBP</option><option>NOK</option><option>DKK</option></select></div>
+  <div class="row"><label>To:</label><select id="cur-to"><option>USD</option><option>EUR</option><option>SEK</option><option>GBP</option><option>NOK</option><option>DKK</option></select></div>
+  <div class="row"><label>Amount:</label><input type="number" id="cur-val" inputmode="decimal" placeholder="Enter amount"></div>
+  <button class="convert-btn currency" onclick="convertCurrency()">Convert</button>
+  <div class="result currency" id="cur-result"></div>
+  <div class="rate-info" id="cur-info"></div>
+</div>
+
+<!-- Price/Volume -->
+<div class="tab-content pricevol" id="pricevol">
+  <div class="title" style="color:#E07B53">⛽ Price/Volume Converter</div>
+  <div class="row"><label>From currency:</label><select id="pv-cur-from"><option>SEK</option><option>EUR</option><option>USD</option><option>GBP</option><option>NOK</option><option>DKK</option></select></div>
+  <div class="row"><label>To currency:</label><select id="pv-cur-to"><option>USD</option><option>EUR</option><option>SEK</option><option>GBP</option><option>NOK</option><option>DKK</option></select></div>
+  <div class="row"><label>From volume:</label><select id="pv-vol-from"><option>Liters</option><option>Gallons</option></select></div>
+  <div class="row"><label>To volume:</label><select id="pv-vol-to"><option>Gallons</option><option>Liters</option></select></div>
+  <div class="row"><label>Price:</label><input type="number" id="pv-val" inputmode="decimal" placeholder="Enter price"></div>
+  <button class="convert-btn pricevol" onclick="convertPriceVolume()">Convert</button>
+  <div class="result pricevol" id="pv-result"></div>
+  <div class="rate-info" id="pv-info"></div>
+</div>
+
+<script>
+// --- Tab switching ---
+document.querySelectorAll('.tab-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    btn.classList.add('active');
+    document.getElementById(btn.dataset.tab).classList.add('active');
+  });
+});
+
+// --- Unit conversions ---
+const symbols = {
+  Celsius:'°C', Fahrenheit:'°F', Kelvin:'K',
+  Meters:'m', Yards:'yd',
+  Kilograms:'kg', Pounds:'lb',
+  Liters:'L', Gallons:'gal'
+};
+
+const conversions = {
+  temperature: {
+    'Celsius→Fahrenheit': c => c*9/5+32, 'Fahrenheit→Celsius': f => (f-32)*5/9,
+    'Celsius→Kelvin': c => c+273.15, 'Kelvin→Celsius': k => k-273.15,
+    'Fahrenheit→Kelvin': f => (f-32)*5/9+273.15, 'Kelvin→Fahrenheit': k => (k-273.15)*9/5+32
+  },
+  length: { 'Meters→Yards': m => m*1.09361, 'Yards→Meters': y => y/1.09361 },
+  weight: { 'Kilograms→Pounds': k => k*2.20462, 'Pounds→Kilograms': p => p/2.20462 },
+  volume: { 'Liters→Gallons': l => l*0.264172, 'Gallons→Liters': g => g/0.264172 }
+};
+
+function convertUnit(cat) {
+  const from = document.getElementById(cat === 'temperature' ? 'temp-from' : cat+'-from').value;
+  const to = document.getElementById(cat === 'temperature' ? 'temp-to' : cat+'-to').value;
+  const val = parseFloat(document.getElementById(cat === 'temperature' ? 'temp-val' : cat+'-val').value);
+  const resultEl = document.getElementById(cat === 'temperature' ? 'temp-result' : cat+'-result');
+
+  if (from === to) { resultEl.textContent = 'Same unit selected.'; return; }
+  if (isNaN(val)) { alert('Please enter a numeric value.'); return; }
+
+  const fn = conversions[cat][from+'→'+to];
+  resultEl.textContent = `${val} ${symbols[from]} = ${fn(val).toFixed(2)} ${symbols[to]}`;
+}
+
+// --- Currency (with fallback) ---
+const eurRates = { EUR:1, SEK:10.8040, GBP:0.86993, DKK:7.4731, NOK:11.0480, USD:1.1782 };
+
+function fallbackRate(src, dst, amount) {
+  return amount * eurRates[dst] / eurRates[src];
+}
+
+async function fetchRate(src, dst, amount) {
+  try {
+    const resp = await fetch(`https://api.frankfurter.dev/v1/latest?amount=${amount}&from=${src}&to=${dst}`);
+    if (!resp.ok) throw new Error(resp.status);
+    const data = await resp.json();
+    return { value: data.rates[dst], date: data.date, live: true };
+  } catch {
+    return { value: fallbackRate(src, dst, amount), date: null, live: false };
+  }
+}
+
+async function convertCurrency() {
+  const src = document.getElementById('cur-from').value;
+  const dst = document.getElementById('cur-to').value;
+  const val = parseFloat(document.getElementById('cur-val').value);
+  const resultEl = document.getElementById('cur-result');
+  const infoEl = document.getElementById('cur-info');
+
+  if (src === dst) { resultEl.textContent = 'Same currency selected.'; infoEl.textContent = ''; return; }
+  if (isNaN(val)) { alert('Please enter a numeric value.'); return; }
+
+  resultEl.textContent = 'Converting...';
+  const r = await fetchRate(src, dst, val);
+  resultEl.textContent = `${val} ${src} = ${r.value.toFixed(2)} ${dst}`;
+  infoEl.textContent = r.live ? `Live rate (${r.date})` : '⚠ Offline — using rates from April 16th 2026';
+}
+
+// --- Price/Volume ---
+const volToLiters = { Liters: 1, Gallons: 3.78541 };
+const volSymbols = { Liters: 'L', Gallons: 'gal' };
+
+async function convertPriceVolume() {
+  const srcCur = document.getElementById('pv-cur-from').value;
+  const dstCur = document.getElementById('pv-cur-to').value;
+  const srcVol = document.getElementById('pv-vol-from').value;
+  const dstVol = document.getElementById('pv-vol-to').value;
+  const val = parseFloat(document.getElementById('pv-val').value);
+  const resultEl = document.getElementById('pv-result');
+  const infoEl = document.getElementById('pv-info');
+
+  if (isNaN(val)) { alert('Please enter a numeric value.'); return; }
+
+  resultEl.textContent = 'Converting...';
+  let priceConverted, isLive = true, date = '';
+
+  if (srcCur === dstCur) {
+    priceConverted = val;
+  } else {
+    const r = await fetchRate(srcCur, dstCur, val);
+    priceConverted = r.value; isLive = r.live; date = r.date;
+  }
+
+  const volRatio = volToLiters[dstVol] / volToLiters[srcVol];
+  const result = priceConverted * volRatio;
+
+  resultEl.textContent = `${val} ${srcCur}/${volSymbols[srcVol]} = ${result.toFixed(2)} ${dstCur}/${volSymbols[dstVol]}`;
+  if (srcCur === dstCur) infoEl.textContent = '';
+  else infoEl.textContent = isLive ? `Live rate (${date})` : '⚠ Offline — using rates from April 16th 2026';
+}
+</script>
+</body>
+</html>
